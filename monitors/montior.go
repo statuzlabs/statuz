@@ -16,6 +16,7 @@ const (
 )
 
 type Result struct {
+	MonitorID string        `json:"monitor_id"`
 	Type      string        `json:"type"`
 	Status    Status        `json:"status"`
 	StartTime time.Time     `json:"start_time"`
@@ -30,4 +31,10 @@ type Result struct {
 
 type Monitor interface {
 	Check(ctx context.Context) Result
+	GetHBInterval() time.Duration
+	GetLastHB() time.Time
+	SetLastHB(hbTime time.Time)
+	IsRunning() bool
+	SetRunning(b bool)
+	GetID() string
 }

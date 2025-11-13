@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+const (
+	DEGRADED_DEFAULT_THRESHHOLD = 2000
+)
+
 // TODO: add zap for logging
 
 type HTTPMonitor struct {
@@ -23,18 +27,44 @@ type HTTPMonitor struct {
 	IPFamily            string        `json:"ip_family"`
 	HTTPMethod          string        `json:"http_method"`
 	DegradedThreshhold  int           `json:"degraded_threshold"`
+	lastHB              time.Time
+	running             bool
 }
 
-func (m *HTTPMonitor) Check() Result {
-	currentRetries := 0
+func (m *HTTPMonitor) GetHBInterval() time.Duration {
+	return m.HBInterval
+}
 
+func (m *HTTPMonitor) GetLastHB() time.Time {
+	return m.lastHB
+}
+
+func (m *HTTPMonitor) SetLastHB(hbTime time.Time) {
+	m.lastHB = hbTime
+}
+
+func (m *HTTPMonitor) IsRunning() bool {
+	return m.running
+}
+
+func (m *HTTPMonitor) SetRunning(b bool) {
+	m.running = b
+}
+
+func (m *HTTPMonitor) GetID() string {
+	return m.ID
+}
+
+func (m *HTTPMonitor) Check(ctx context.Context) Result {
+	currentRetries := 0
 PerformCheck:
 	if currentRetries >= m.Retries+1 {
 		return Result{
-			Type:    "http/https",
-			Status:  StatusDown,
-			Success: false,
-			Error:   "max retries reached",
+			MonitorID: m.ID,
+			Type:      "http/https",
+			Status:    StatusDown,
+			Success:   false,
+			Error:     "max retries reached",
 		}
 	}
 
@@ -45,6 +75,7 @@ PerformCheck:
 		goto PerformCheck
 	}
 	res := Result{
+		MonitorID: m.ID,
 		Type:      "http/https",
 		Status:    StatusUp,
 		StartTime: checkResult.start,
@@ -54,7 +85,7 @@ PerformCheck:
 		CheckedAt: checkResult.start,
 	}
 	if m.DegradedThreshhold <= 0 {
-		m.DegradedThreshhold = 2000
+		m.DegradedThreshhold = DEGRADED_DEFAULT_THRESHHOLD
 	}
 	if checkResult.duration.Milliseconds() >= int64(m.DegradedThreshhold) {
 		res.Status = StatusDegraded
