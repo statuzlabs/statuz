@@ -5,13 +5,13 @@ This roadmap outlines the development goals for **Statuz** — a lightweight, se
 ---
 
 ## ✅ Phase 1: Core Foundation
-- [ ] Initialize Go project structure
+- [X] Initialize Go project structure
 - [ ] Implement configuration system (YAML / env support)
-- [ ] Add logging and structured error handling
-- [ ] Core monitor engine
-  - [ ] HTTP(s) checks
+- [X] Add logging and structured error handling
+- [X] Core monitor engine
+  - [X] HTTP(s) checks
   - [ ] TCP checks
-  - [ ] Interval scheduler with goroutines
+  - [X] Interval scheduler with goroutines
 - [ ] Status aggregation
   - [ ] In‑memory storage
   - [ ] Basic persistence with SQLite or Postgres
@@ -59,7 +59,6 @@ This roadmap outlines the development goals for **Statuz** — a lightweight, se
 
 ## 💡 Future Ideas
 - [ ] Role‑based access control (RBAC)
-- [ ] Multi‑tenant support
 - [ ] Graphs / metrics dashboards
 - [ ] API performance statistics
 - [ ] External plugin system for custom monitors
